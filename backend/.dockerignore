@@ -1,0 +1,19 @@
+# Python
+**/__pycache__/
+
+# VS Code
+/.vscode
+
+# Django
+backend/static/
+backend/media/
+backend/db.sqlite3
+*.sqlite3
+
+# Docker
+.dockerignore
+Dockerfile
+
+# Git
+.gitignore
+README.md

@@ -1,0 +1,25 @@
+services:
+  3d-postgres:
+    image: postgres:16.1
+    container_name: 3d-postgres
+    hostname: postgres.3d.internal
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+       - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  3d-backend:
+    build:
+      context: ./backend
+      target: base
+    image: 3d-backend:local-dev
+    container_name: 3d-backend
+    hostname: backend.3d.internal
+    env_file: .env
+    command: ["--dev"]
+    restart: unless-stopped
+    volumes:
+      - ./backend/core:/app/core
+    ports:
+      - 8000:80

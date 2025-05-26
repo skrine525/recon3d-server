@@ -1,0 +1,4 @@
+# Service
+/data
+/logs
+.env
