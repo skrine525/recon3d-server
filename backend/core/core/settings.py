@@ -73,7 +73,7 @@ INSTALLED_APPS = [
     'corsheaders',
     
     # Local apps
-    'mobile',
+    'common_api',
 ]
 
 MIDDLEWARE = [
@@ -171,12 +171,12 @@ SIMPLE_JWT = {
 
 # Djoser settings
 DJOSER = {
-    'LOGIN_FIELD': 'email',
+    'LOGIN_FIELD': 'username',
     'USER_CREATE_PASSWORD_RETYPE': True,
     'SERIALIZERS': {
         'user_create': 'djoser.serializers.UserCreateSerializer',
-        'user': 'djoser.serializers.UserSerializer',
-        'current_user': 'djoser.serializers.UserSerializer',
+        'user': 'common_api.serializers.CustomUserSerializer',
+        'current_user': 'common_api.serializers.CustomUserSerializer',
     },
     'TOKEN_MODEL': None,  # Отключаем токен-аутентификацию
 }

@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-class MobileConfig(AppConfig):
+class CommonApiConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'mobile'
-    verbose_name = 'Mobile API' 
+    name = 'common_api'
+    verbose_name = 'Common API' 
