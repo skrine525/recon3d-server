@@ -9,7 +9,11 @@ class CustomUserSerializer(UserSerializer):
     display_name = serializers.SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'is_staff', 'display_name')
+        fields = (
+            'id', 'username', 'email', 'first_name',
+            'last_name', 'is_staff', 'is_superuser',
+            'display_name', 'date_joined'
+        )
 
     def get_display_name(self, obj):
         full_name = f"{obj.first_name} {obj.last_name}".strip()
