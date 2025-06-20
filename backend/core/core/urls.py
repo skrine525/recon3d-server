@@ -6,7 +6,7 @@ from .swagger import schema_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('djoser.urls')),  # Пользовательские эндпоинты
-    path('api/v1/', include('djoser.urls.jwt')),  # JWT эндпоинты
+    path('api/v1/', include('djoser.urls.authtoken')),  # Эндпоинты для обычных токенов
     path('api/v1/common/', include('common_api.urls')),  # Мобильные эндпоинты
     
     # Swagger URLs

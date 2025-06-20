@@ -63,7 +63,7 @@ INSTALLED_APPS = [
     
     # Third party apps
     'rest_framework',
-    'rest_framework_simplejwt',
+    'rest_framework.authtoken',
     'djoser',
     'drf_yasg',
     'corsheaders',
@@ -138,7 +138,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # REST Framework settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -173,8 +173,7 @@ DJOSER = {
         'user_create': 'djoser.serializers.UserCreateSerializer',
         'user': 'common_api.serializers.CustomUserSerializer',
         'current_user': 'common_api.serializers.CustomUserSerializer',
-    },
-    'TOKEN_MODEL': None,  # Отключаем токен-аутентификацию
+    }
 }
 
 # Swagger settings
