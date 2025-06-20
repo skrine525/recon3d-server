@@ -6,6 +6,8 @@ User = get_user_model()
 
 class CustomUserSerializer(UserSerializer):
     is_staff = serializers.BooleanField(read_only=True)
+    is_superuser = serializers.BooleanField(read_only=True)
+    date_joined = serializers.DateTimeField(read_only=True)
     display_name = serializers.SerializerMethodField()
 
     class Meta(UserSerializer.Meta):
