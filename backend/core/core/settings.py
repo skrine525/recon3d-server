@@ -69,7 +69,7 @@ INSTALLED_APPS = [
     'corsheaders',
     
     # Local apps
-    'common_api',
+    'common',
 ]
 
 MIDDLEWARE = [
@@ -171,8 +171,8 @@ DJOSER = {
     'USER_CREATE_PASSWORD_RETYPE': True,
     'SERIALIZERS': {
         'user_create': 'djoser.serializers.UserCreateSerializer',
-        'user': 'common_api.serializers.CustomUserSerializer',
-        'current_user': 'common_api.serializers.CustomUserSerializer',
+        'user': 'common.api.serializers.CustomUserSerializer',
+        'current_user': 'common.api.serializers.CustomUserSerializer',
     }
 }
 
