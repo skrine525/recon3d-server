@@ -17,4 +17,5 @@ class CustomUserSerializer(UserSerializer):
 
     def get_display_name(self, obj):
         full_name = f"{obj.first_name} {obj.last_name}".strip()
+        
         return full_name if full_name else obj.username
