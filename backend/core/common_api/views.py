@@ -10,4 +10,4 @@ class MetaView(APIView):
     permission_classes = []  # Разрешаем доступ без аутентификации
 
     def get(self, request):
-        return Response(status=status.HTTP_204_NO_CONTENT) 
+        return Response(status=status.HTTP_204_NO_CONTENT)
