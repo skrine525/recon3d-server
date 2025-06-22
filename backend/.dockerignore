@@ -1,14 +1,20 @@
 # Python
-**/__pycache__/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
 # VS Code
-/.vscode
+.vscode/
 
 # Django
-backend/static/
-backend/media/
-backend/db.sqlite3
+media/
+staticfiles/
+db.sqlite3
 *.sqlite3
+
+# Environment
+.env
 
 # Docker
 .dockerignore

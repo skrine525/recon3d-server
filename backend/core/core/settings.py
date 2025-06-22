@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     
     # Local apps
     'common',
+    'mainpage',
 ]
 
 MIDDLEWARE = [
@@ -212,7 +213,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'static'
+# Директория, куда `collectstatic` будет собирать все статические файлы для продакшена.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Удаляем STATICFILES_DIRS, так как Django автоматически находит
+# статические файлы в директориях 'static' внутри каждого приложения.
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
