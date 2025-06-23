@@ -95,6 +95,13 @@
             transform: scale(1);
         }
 
+        .version-label {
+            color: #888;
+            font-size: 0.95em;
+            margin-bottom: 20px;
+            display: block;
+        }
+
         @media (min-width: 768px) {
             .container {
                 max-width: 600px;
@@ -110,9 +117,16 @@
         </div>
         <div class="content">
             <p>Ваша реконструкция плана помещения и идентификация пользователя.</p>
-            <a href="{% static 'mainpage/recon3d_latest.apk' %}" class="download-btn" download>
-                Скачать для Android
-            </a>
+            {% if download_url %}
+                {% if version %}
+                    <span class="version-label">Версия: {{ version }}</span>
+                {% endif %}
+                <a href="{{ download_url }}" class="download-btn" download>
+                    Скачать для Android
+                </a>
+            {% else %}
+                <span style="color: #c00;">Файл приложения пока не загружен</span>
+            {% endif %}
         </div>
     </div>
 

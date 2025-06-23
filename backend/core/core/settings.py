@@ -16,7 +16,8 @@ SECRET_KEY = config.SECRET_KEY
 DEBUG = config.DEBUG
 
 ALLOWED_HOSTS = [
-    'dev.radabot.ru'
+    'dev.radabot.ru',
+    'localhost'
 ]
 
 
