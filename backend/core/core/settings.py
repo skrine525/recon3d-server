@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'common',
     'mainpage',
     'upload_files',
+    'reconstruction',
 ]
 
 MIDDLEWARE = [
