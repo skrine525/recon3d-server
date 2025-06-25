@@ -30,7 +30,7 @@ WORKDIR /app/core
 ##############
 # Боевой образ
 
-FROM base AS production
+FROM base AS app
 
 # Переносим исходный код Django проекта
 COPY ./core .
