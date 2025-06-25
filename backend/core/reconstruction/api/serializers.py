@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import InitialMaskFile, HoughPreviewFile
+from reconstruction.models import InitialMaskFile, HoughPreviewFile
 
 class CalculateInitialMaskSerializer(serializers.Serializer):
     file_id = serializers.UUIDField(required=True)
