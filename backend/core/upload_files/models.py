@@ -21,6 +21,7 @@ class UploadedFile(models.Model):
     class SourceType(models.IntegerChoices):
         PLAN_2D = 1, '2D-план'
         USER_ENV = 2, 'Окружение пользователя'
+        USER_MASK = 3, 'Маска пользователя'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     file_type = models.PositiveSmallIntegerField(choices=FileType.choices)

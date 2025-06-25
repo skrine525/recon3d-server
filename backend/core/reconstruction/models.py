@@ -19,3 +19,19 @@ class InitialMaskFile(models.Model):
 
     def __str__(self):
         return f'{self.id} ({self.created_at:%Y-%m-%d %H:%M})'
+
+class HoughPreviewFile(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    plan_upload_file_id = models.UUIDField()
+    user_mask_upload_file_id = models.UUIDField()
+    created_at = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hough_previews')
+    file_path = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name = 'Hough preview файл'
+        verbose_name_plural = 'Hough preview файлы'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.id} ({self.created_at:%Y-%m-%d %H:%M})'
