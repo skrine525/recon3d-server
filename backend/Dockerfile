@@ -12,6 +12,9 @@ COPY ./poetry.lock .
 RUN pip install poetry==2.0.0
 RUN poetry install
 
+# Установка пакетов
+RUN apt-get update && apt-get install -y libgl1 libglib2.0-0
+
 # Перемещаем ресурсы контейнера
 COPY ./docker/app ./docker/app
 
@@ -27,7 +30,7 @@ WORKDIR /app/core
 ##############
 # Боевой образ
 
-FROM base AS production
+FROM base AS app
 
 # Переносим исходный код Django проекта
 COPY ./core .
@@ -35,7 +38,7 @@ COPY ./core .
 #################################
 # Образ сборки статических файлов
  
-FROM production AS build-static
+FROM app AS build-static
 
 RUN poetry run python manage.py collectstatic --noinput
 
@@ -45,5 +48,5 @@ RUN poetry run python manage.py collectstatic --noinput
 FROM nginx:1.27.5-alpine AS static
 
 RUN rm -rf /usr/share/nginx/*
-COPY --from=build-static /app/core/static /usr/share/nginx
+COPY --from=build-static /app/core/staticfiles /usr/share/nginx
 COPY ./docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
