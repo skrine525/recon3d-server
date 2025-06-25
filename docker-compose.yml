@@ -1,4 +1,16 @@
 services:
+  3d-static:
+    build:
+      context: ./backend
+      target: static
+    image: 3d-static
+    container_name: 3d-static
+    restart: unless-stopped
+    hostname: static.3d.internal
+    networks:
+      - 3d
+    volumes:
+      - ./logs/3d-static:/var/log/nginx/
   3d-backend:
     build:
       context: ./backend
@@ -13,18 +25,6 @@ services:
       - postgres
     volumes:
       - 3d-media:/app/core/media
-  3d-static:
-    build:
-      context: ./backend
-      target: static
-    image: 3d-static
-    container_name: 3d-static
-    restart: unless-stopped
-    hostname: static.3d.internal
-    networks:
-      - 3d
-    volumes:
-      - ./logs/3d-static:/var/log/nginx/
   3d-nginx:
     build: nginx
     image: 3d-nginx
