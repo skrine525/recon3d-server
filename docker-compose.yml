@@ -10,6 +10,7 @@ services:
     hostname: backend.3d.internal
     networks:
       - 3d
+      - postgres
     volumes:
       - 3d-media:/app/core/media
   3d-static:
@@ -45,3 +46,5 @@ networks:
   3d:
     name: 3d
     driver: bridge
+  postgres:
+    external: true
