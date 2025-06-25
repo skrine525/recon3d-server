@@ -37,6 +37,9 @@ services:
       - 127.0.0.1:9070:80
     volumes:
       - ./logs/3d-nginx:/var/log/nginx/
+    depends_on:
+      - 3d-static
+      - 3d-backend
 
 volumes:
   3d-media:
