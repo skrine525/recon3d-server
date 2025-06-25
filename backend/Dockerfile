@@ -48,5 +48,5 @@ RUN poetry run python manage.py collectstatic --noinput
 FROM nginx:1.27.5-alpine AS static
 
 RUN rm -rf /usr/share/nginx/*
-COPY --from=build-static /app/core/static /usr/share/nginx
+COPY --from=build-static /app/core/staticfiles /usr/share/nginx
 COPY ./docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
