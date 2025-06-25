@@ -17,17 +17,20 @@ DEBUG = config.DEBUG
 
 ALLOWED_HOSTS = [
     'dev.radabot.ru',
-    'localhost'
+    '3d.radabot.ru',
+    'localhost',
 ]
 
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
     'https://dev.radabot.ru',
+    'https://3d.radabot.ru',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://dev.radabot.ru',
+    'https://3d.radabot.ru',
 ]
 
 CORS_ALLOW_METHODS = [
