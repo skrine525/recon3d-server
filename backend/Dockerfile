@@ -38,7 +38,7 @@ COPY ./core .
 #################################
 # Образ сборки статических файлов
  
-FROM production AS build-static
+FROM app AS build-static
 
 RUN poetry run python manage.py collectstatic --noinput
 
