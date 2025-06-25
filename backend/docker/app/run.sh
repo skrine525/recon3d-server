@@ -6,5 +6,5 @@ if [ "$1" = "-d" ] || [ "$1" = "--dev" ]; then
 else
     while ! < /dev/tcp/$DATABASE_HOST/$DATABASE_PORT; do sleep 1; done;
     poetry run python manage.py migrate
-    poetry run gunicorn backend.wsgi -b 0.0.0.0:80 --workers=1
+    poetry run gunicorn core.wsgi -b 0.0.0.0:80 --workers=1
 fi
