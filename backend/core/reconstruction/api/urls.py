@@ -2,8 +2,8 @@ from django.urls import path
 from .views import CalculateInitialMaskView, CalculateHoughView, CalculateMeshView, SaveReconstructionView
 
 urlpatterns = [
-    path('calculate-initial-mask', CalculateInitialMaskView.as_view(), name='calculate-initial-mask'),
-    path('calculate-hough', CalculateHoughView.as_view(), name='calculate-hough'),
-    path('calculate-mesh', CalculateMeshView.as_view(), name='calculate-mesh'),
-    path('save', SaveReconstructionView.as_view(), name='save-reconstruction'),
+    path('initial-masks', CalculateInitialMaskView.as_view(), name='initial-masks'),
+    path('houghs', CalculateHoughView.as_view(), name='houghs'),
+    path('reconstructions', CalculateMeshView.as_view(), name='reconstructions'),
+    path('reconstructions/<int:id>/save', SaveReconstructionView.as_view(), name='save-reconstruction'),
 ] 

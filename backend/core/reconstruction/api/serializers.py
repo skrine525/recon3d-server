@@ -59,5 +59,4 @@ class ReconstructionSerializer(serializers.ModelSerializer):
         return obj.get_name()
 
 class SaveReconstructionSerializer(serializers.Serializer):
-    id = serializers.IntegerField(required=True)
     name = serializers.CharField(required=True) 

@@ -141,13 +141,12 @@ class CalculateMeshView(APIView):
 class SaveReconstructionView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def put(self, request, *args, **kwargs):
+    def put(self, request, id, *args, **kwargs):
         serializer = SaveReconstructionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        reconstruction_id = serializer.validated_data['id']
         name = serializer.validated_data['name']
         try:
-            reconstruction = Reconstruction.objects.get(id=reconstruction_id)
+            reconstruction = Reconstruction.objects.get(id=id)
         except Reconstruction.DoesNotExist:
             return Response({'detail': 'Реконструкция не найдена'}, status=status.HTTP_404_NOT_FOUND)
         if reconstruction.created_by != request.user:
