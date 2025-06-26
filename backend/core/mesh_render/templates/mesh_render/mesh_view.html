@@ -56,49 +56,47 @@
         pointLight2.position.set(0, 0, -10);
         scene.add(pointLight2);
 
+        let modelGroup = null;
         // Загрузка OBJ модели
         const objLoader = new THREE.OBJLoader();
         objLoader.load(
             '{{ mesh_url }}',
             function (object) {
-                // Пересчитываем нормали, если их нет
+                // Пересчитываем нормали и применяем материал
                 object.traverse(function (child) {
                     if (child instanceof THREE.Mesh) {
                         if (!child.geometry.hasAttribute || !child.geometry.hasAttribute('normal')) {
                             child.geometry.computeVertexNormals();
                         }
-                        // Применяем материал
-                        child.material = new THREE.MeshPhongMaterial({ color: 0x888888, specular: 0xffffff, shininess: 60, wireframe: false });
+                        child.material = new THREE.MeshPhongMaterial({ color: 0x555555, specular: 0x222222, shininess: 10, wireframe: false });
                         child.material.needsUpdate = true;
                     }
                 });
 
-                // --- Надёжный автофрейминг и Z-up ---
-
-                // 1. Поворачиваем модель, чтобы её "верх" смотрел вдоль Z
+                // Поворачиваем модель, чтобы Z был вверх
                 object.rotation.x = -Math.PI / 2;
                 object.updateMatrixWorld();
 
-                // 2. Центрируем модель
+                // Центрируем модель внутри группы
                 const box = new THREE.Box3().setFromObject(object);
                 const center = box.getCenter(new THREE.Vector3());
                 object.position.sub(center);
 
-                // 3. Настраиваем камеру, чтобы она смотрела на модель
+                // Группа для вращения по центру
+                modelGroup = new THREE.Group();
+                modelGroup.add(object);
+                scene.add(modelGroup);
+
+                // Автофрейминг камеры
                 const sphere = box.getBoundingSphere(new THREE.Sphere());
                 const radius = sphere.radius;
                 const camDistance = radius / Math.tan(camera.fov * Math.PI / 360);
-                
                 camera.position.set(0, -camDistance * 1.2, radius);
-                controls.target.copy(sphere.center); // Целимся в центр модели
-                
-                // 4. Настраиваем плоскости отсечения, чтобы модель не обрезалась
+                controls.target.set(0, 0, 0);
                 camera.near = camDistance / 100;
                 camera.far = camDistance * 2;
                 camera.updateProjectionMatrix();
-
                 controls.update();
-                scene.add(object);
             },
             function (xhr) { /* прогресс */ },
             function (error) { console.error('Ошибка загрузки OBJ:', error); }
