@@ -10,10 +10,10 @@ from .permissions import IsSuperUser, CanChangePassword, CanChangeIsActive
 
 User = get_user_model()
 
-class MetaView(APIView):
+class InfoView(APIView):
     """
     Эндпоинт для проверки работоспособности приложения.
-    В будущем будет возвращать метаданные приложения.
+    В будущем будет возвращать информацию о приложении.
     """
     permission_classes = []  # Разрешаем доступ без аутентификации
 
