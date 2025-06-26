@@ -20,6 +20,7 @@ def mesh_view(request, id):
     context = {
         'id': id,
         'mesh_url': mesh_url,
-        'target_point_json': json.dumps(target_point)
+        'target_point_json': json.dumps(target_point),
+        'title': reconstruction.get_name()
     }
     return render(request, 'mesh_render/mesh_view.html', context)

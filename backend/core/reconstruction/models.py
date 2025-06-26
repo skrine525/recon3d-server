@@ -41,8 +41,8 @@ class Reconstruction(models.Model):
     mesh_file_path = models.CharField(max_length=255)
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reconstructions')
-    is_saved = models.BooleanField(default=False)
-    saved_at = models.DateTimeField(null=True, blank=True, default=None)
+    saved_at = models.DateTimeField(null=True, blank=True, default=None, db_index=True)
+    name = models.CharField(max_length=255, null=True, blank=True, default=None)
 
     class Meta:
         verbose_name = '3D реконструкция'
@@ -50,4 +50,7 @@ class Reconstruction(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f'{self.id} ({self.created_at:%Y-%m-%d %H:%M})'
+        return f'{self.get_name()} ({self.created_at:%Y-%m-%d %H:%M})'
+
+    def get_name(self):
+        return self.name if self.name else f'Реконструкция №{self.id}'

@@ -129,7 +129,9 @@ class CalculateMeshView(APIView):
             mesh_file_path=mesh_rel_path,
             created_at=timezone.now(),
             created_by=request.user,
-            is_saved=False,
-            saved_at=None
+            saved_at=None,
+            name=None
         )
-        return Response(ReconstructionSerializer(mesh_obj).data, status=status.HTTP_201_CREATED) 
+        response = Response(ReconstructionSerializer(mesh_obj).data, status=status.HTTP_201_CREATED)
+        response['X-Tab-Title'] = mesh_obj.get_name()
+        return response 

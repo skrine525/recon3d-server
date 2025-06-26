@@ -42,9 +42,10 @@ class CalculateMeshSerializer(serializers.Serializer):
 
 class ReconstructionSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
     class Meta:
         model = Reconstruction
-        fields = ['id', 'mesh_file_path', 'created_at', 'created_by', 'is_saved', 'saved_at', 'url']
+        fields = ['id', 'name', 'mesh_file_path', 'created_at', 'created_by', 'saved_at', 'url']
         read_only_fields = fields
 
     def get_url(self, obj):
@@ -52,4 +53,7 @@ class ReconstructionSerializer(serializers.ModelSerializer):
         from urllib.parse import urljoin
         base = getattr(config, 'APPLICATION_URL', '')
         media_url = '/media/'
-        return urljoin(urljoin(base, media_url), obj.mesh_file_path) if obj.mesh_file_path else None 
+        return urljoin(urljoin(base, media_url), obj.mesh_file_path) if obj.mesh_file_path else None
+
+    def get_name(self, obj):
+        return obj.get_name() 
