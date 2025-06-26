@@ -19,6 +19,7 @@ from PIL import Image
 import numpy as np
 import cv2
 from rest_framework.parsers import JSONParser
+from rest_framework import generics
 
 class CalculateInitialMaskView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -91,10 +92,21 @@ class CalculateHoughView(APIView):
         )
         return Response(HoughPreviewFileSerializer(hough_obj).data, status=status.HTTP_201_CREATED)
 
-class CalculateMeshView(APIView):
+class ReconstructionListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ReconstructionSerializer
 
-    def post(self, request, *args, **kwargs):
+    def get_queryset(self):
+        queryset = Reconstruction.objects.filter(created_by=self.request.user)
+        is_saved = self.request.query_params.get('is_saved')
+        if is_saved is not None:
+            if is_saved.lower() in ['1', 'true', 'yes']:
+                queryset = queryset.filter(saved_at__isnull=False)
+            elif is_saved.lower() in ['0', 'false', 'no']:
+                queryset = queryset.filter(saved_at__isnull=True)
+        return queryset
+
+    def create(self, request, *args, **kwargs):
         serializer = CalculateMeshSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         plan_file_id = serializer.validated_data['plan_file_id']
@@ -113,7 +125,6 @@ class CalculateMeshView(APIView):
             return Response({'detail': 'user_mask_file_id должен быть маской пользователя'}, status=status.HTTP_400_BAD_REQUEST)
         plan_path = os.path.join(settings.MEDIA_ROOT, plan_file.file_path)
         user_mask_path = os.path.join(settings.MEDIA_ROOT, user_mask_file.file_path)
-        # Используем только reconstruct_3d_from_plan и save_mesh
         try:
             mesh = reconstruct_3d_from_plan(plan_path, user_mask_path)
         except Exception as e:
@@ -136,7 +147,7 @@ class CalculateMeshView(APIView):
         )
         response = Response(ReconstructionSerializer(mesh_obj).data, status=status.HTTP_201_CREATED)
         response['X-Tab-Title'] = mesh_obj.get_name()
-        return response 
+        return response
 
 class SaveReconstructionView(APIView):
     permission_classes = [permissions.IsAuthenticated]
