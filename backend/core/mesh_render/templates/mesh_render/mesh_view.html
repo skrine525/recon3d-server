@@ -41,21 +41,35 @@
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
 
-        // Свет (усиливаем для яркости)
-        scene.add(new THREE.AmbientLight(0xffffff, 1.2));
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        dirLight.position.set(5, 10, 7.5);
-        scene.add(dirLight);
+        // Свет (много и с разных сторон)
+        scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+        const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight1.position.set(5, 10, 7.5);
+        scene.add(dirLight1);
+        const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight2.position.set(-5, -10, 7.5);
+        scene.add(dirLight2);
+        const pointLight1 = new THREE.PointLight(0xffffff, 1.2);
+        pointLight1.position.set(0, 0, 10);
+        scene.add(pointLight1);
+        const pointLight2 = new THREE.PointLight(0xffffff, 0.8);
+        pointLight2.position.set(0, 0, -10);
+        scene.add(pointLight2);
 
         // Загрузка OBJ модели
         const objLoader = new THREE.OBJLoader();
         objLoader.load(
             '{{ mesh_url }}',
             function (object) {
-                // Делаем все материалы гарантированно серыми
+                // Пересчитываем нормали, если их нет
                 object.traverse(function (child) {
                     if (child instanceof THREE.Mesh) {
-                        child.material = new THREE.MeshLambertMaterial({ color: 0x888888 });
+                        if (!child.geometry.hasAttribute || !child.geometry.hasAttribute('normal')) {
+                            child.geometry.computeVertexNormals();
+                        }
+                        // Применяем материал
+                        child.material = new THREE.MeshPhongMaterial({ color: 0x888888, specular: 0xffffff, shininess: 60, wireframe: false });
+                        child.material.needsUpdate = true;
                     }
                 });
 
