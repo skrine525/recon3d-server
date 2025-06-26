@@ -60,17 +60,40 @@
                         child.material.needsUpdate = true;
                     }
                 });
+                
                 // НЕ вращаем модель по X, чтобы сохранить Z-вверх
                 // object.rotation.x = -Math.PI / 2;
                 object.updateMatrixWorld();
+                
                 const box = new THREE.Box3().setFromObject(object);
                 const center = box.getCenter(new THREE.Vector3());
                 object.position.sub(center);
+                
                 modelGroup = new THREE.Group();
                 modelGroup.add(object);
                 scene.add(modelGroup);
+                
                 const sphere = box.getBoundingSphere(new THREE.Sphere());
                 const radius = sphere.radius;
+                
+                // Визуализация точки, если она есть
+                const targetPoint = JSON.parse('{{ target_point_json|escapejs }}');
+                if (targetPoint) {
+                    const sphereRadius = radius * 0.02; // Радиус шарика — 2% от радиуса модели
+                    const sphereGeo = new THREE.SphereGeometry(sphereRadius, 16, 16);
+                    const sphereMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+                    const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+                    
+                    // Позиционируем относительно исходного origin модели
+                    const pointPosition = new THREE.Vector3(targetPoint.x, targetPoint.y, targetPoint.z);
+                    pointPosition.add(object.position); // Добавляем смещение origin
+                    
+                    sphereMesh.position.copy(pointPosition);
+                    
+                    // Добавляем шарик в ту же группу, что и модель
+                    modelGroup.add(sphereMesh);
+                }
+
                 const camDistance = radius / Math.tan(camera.fov * Math.PI / 360);
                 camera.position.set(0, -camDistance * 1.2, radius);
                 controls.target.set(0, 0, 0);
