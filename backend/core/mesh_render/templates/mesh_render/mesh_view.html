@@ -6,22 +6,9 @@
     <style>
         body { margin: 0; overflow: hidden; background: #222; }
         #container { width: 100vw; height: 100vh; }
-        .back-link {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 10;
-            background: rgba(255,255,255,0.8);
-            padding: 8px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #222;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
-    <a href="/" class="back-link">← На главную</a>
     <div id="container"></div>
     <script src="https://cdn.jsdelivr.net/npm/three@0.119/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.119/examples/js/loaders/OBJLoader.js"></script>
@@ -48,10 +35,6 @@
         // Запрещаем смотреть "из-под земли"
         controls.maxPolarAngle = Math.PI / 2;
         controls.update();
-
-        // Добавляю AxesHelper для визуализации осей (Z — синий вверх)
-        const axesHelper = new THREE.AxesHelper(2);
-        scene.add(axesHelper);
 
         // Свет (яркий, но сбалансированный)
         scene.add(new THREE.AmbientLight(0xffffff, 1.0));
