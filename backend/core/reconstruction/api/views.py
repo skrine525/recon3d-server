@@ -3,18 +3,20 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from .serializers import (
     CalculateInitialMaskSerializer, InitialMaskFileSerializer,
-    CalculateHoughSerializer, HoughPreviewFileSerializer
+    CalculateHoughSerializer, HoughPreviewFileSerializer,
+    CalculateMeshSerializer, ReconstructionSerializer
 )
-from reconstruction.models import InitialMaskFile, HoughPreviewFile
+from reconstruction.models import InitialMaskFile, HoughPreviewFile, Reconstruction
 from upload_files.models import UploadedFile
 from django.conf import settings
 from django.utils import timezone
 import uuid
 import os
 from core import config
-from reconstruction.utils.plan2reconstruction import get_initial_mask_and_image, process_and_get_hough_preview
+from reconstruction.utils.plan2reconstruction import get_initial_mask_and_image, process_and_get_hough_preview, lines_to_3d, save_mesh, reconstruct_3d_from_plan
 from PIL import Image
 import numpy as np
+import cv2
 
 class CalculateInitialMaskView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -85,4 +87,49 @@ class CalculateHoughView(APIView):
             created_by=request.user,
             file_path=hough_rel_path
         )
-        return Response(HoughPreviewFileSerializer(hough_obj).data, status=status.HTTP_201_CREATED) 
+        return Response(HoughPreviewFileSerializer(hough_obj).data, status=status.HTTP_201_CREATED)
+
+class CalculateMeshView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = CalculateMeshSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        plan_file_id = serializer.validated_data['plan_file_id']
+        user_mask_file_id = serializer.validated_data['user_mask_file_id']
+        try:
+            plan_file = UploadedFile.objects.get(id=plan_file_id)
+        except UploadedFile.DoesNotExist:
+            return Response({'detail': 'План не найден'}, status=status.HTTP_404_NOT_FOUND)
+        if plan_file.file_type != UploadedFile.FileType.PHOTO or plan_file.source_type != UploadedFile.SourceType.PLAN_2D:
+            return Response({'detail': 'plan_file_id должен быть фото 2D-плана'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user_mask_file = UploadedFile.objects.get(id=user_mask_file_id)
+        except UploadedFile.DoesNotExist:
+            return Response({'detail': 'Маска не найдена'}, status=status.HTTP_404_NOT_FOUND)
+        if user_mask_file.file_type != UploadedFile.FileType.PHOTO or user_mask_file.source_type != UploadedFile.SourceType.USER_MASK:
+            return Response({'detail': 'user_mask_file_id должен быть маской пользователя'}, status=status.HTTP_400_BAD_REQUEST)
+        plan_path = os.path.join(settings.MEDIA_ROOT, plan_file.file_path)
+        user_mask_path = os.path.join(settings.MEDIA_ROOT, user_mask_file.file_path)
+        # Используем только reconstruct_3d_from_plan и save_mesh
+        try:
+            mesh = reconstruct_3d_from_plan(plan_path, user_mask_path)
+        except Exception as e:
+            return Response({'detail': f'Ошибка при построении меша: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        if mesh is None:
+            return Response({'detail': 'Не удалось построить 3D-модель (нет линий)'}, status=status.HTTP_400_BAD_REQUEST)
+        mesh_rel_path = f'mesh/{uuid.uuid4()}.obj'
+        mesh_abs_path = os.path.join(settings.MEDIA_ROOT, mesh_rel_path)
+        os.makedirs(os.path.dirname(mesh_abs_path), exist_ok=True)
+        try:
+            save_mesh(mesh, mesh_abs_path)
+        except Exception as e:
+            return Response({'detail': f'Ошибка при сохранении меша: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        mesh_obj = Reconstruction.objects.create(
+            mesh_file_path=mesh_rel_path,
+            created_at=timezone.now(),
+            created_by=request.user,
+            is_saved=False,
+            saved_at=None
+        )
+        return Response(ReconstructionSerializer(mesh_obj).data, status=status.HTTP_201_CREATED) 

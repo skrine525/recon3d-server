@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from reconstruction.models import InitialMaskFile, HoughPreviewFile
+from reconstruction.models import InitialMaskFile, HoughPreviewFile, Reconstruction
 
 class CalculateInitialMaskSerializer(serializers.Serializer):
     file_id = serializers.UUIDField(required=True)
@@ -34,4 +34,22 @@ class HoughPreviewFileSerializer(serializers.ModelSerializer):
         from urllib.parse import urljoin
         base = getattr(config, 'APPLICATION_URL', '')
         media_url = '/media/'
-        return urljoin(urljoin(base, media_url), obj.file_path) if obj.file_path else None 
+        return urljoin(urljoin(base, media_url), obj.file_path) if obj.file_path else None
+
+class CalculateMeshSerializer(serializers.Serializer):
+    plan_file_id = serializers.UUIDField(required=True)
+    user_mask_file_id = serializers.UUIDField(required=True)
+
+class ReconstructionSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+    class Meta:
+        model = Reconstruction
+        fields = ['id', 'mesh_file_path', 'created_at', 'created_by', 'is_saved', 'saved_at', 'url']
+        read_only_fields = fields
+
+    def get_url(self, obj):
+        from core import config
+        from urllib.parse import urljoin
+        base = getattr(config, 'APPLICATION_URL', '')
+        media_url = '/media/'
+        return urljoin(urljoin(base, media_url), obj.mesh_file_path) if obj.mesh_file_path else None 
