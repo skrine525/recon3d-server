@@ -8,7 +8,7 @@ class InitialMaskFileSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
     class Meta:
         model = InitialMaskFile
-        fields = ['id', 'source_upload_file_id', 'created_at', 'created_by', 'file_path', 'url']
+        fields = ['id', 'source_upload_file_id', 'created_at', 'created_by', 'url']
         read_only_fields = fields
 
     def get_url(self, obj):
@@ -26,7 +26,7 @@ class HoughPreviewFileSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
     class Meta:
         model = HoughPreviewFile
-        fields = ['id', 'plan_upload_file_id', 'user_mask_upload_file_id', 'created_at', 'created_by', 'file_path', 'url']
+        fields = ['id', 'plan_upload_file_id', 'user_mask_upload_file_id', 'created_at', 'created_by', 'url']
         read_only_fields = fields
 
     def get_url(self, obj):
@@ -45,7 +45,7 @@ class ReconstructionSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     class Meta:
         model = Reconstruction
-        fields = ['id', 'name', 'mesh_file_path', 'created_at', 'created_by', 'saved_at', 'url']
+        fields = ['id', 'name', 'created_at', 'created_by', 'saved_at', 'url']
         read_only_fields = fields
 
     def get_url(self, obj):
