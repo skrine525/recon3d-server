@@ -56,4 +56,8 @@ class ReconstructionSerializer(serializers.ModelSerializer):
         return urljoin(urljoin(base, media_url), obj.mesh_file_path) if obj.mesh_file_path else None
 
     def get_name(self, obj):
-        return obj.get_name() 
+        return obj.get_name()
+
+class SaveReconstructionSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=True)
+    name = serializers.CharField(required=True) 

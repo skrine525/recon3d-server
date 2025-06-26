@@ -4,7 +4,8 @@ from rest_framework import status, permissions
 from .serializers import (
     CalculateInitialMaskSerializer, InitialMaskFileSerializer,
     CalculateHoughSerializer, HoughPreviewFileSerializer,
-    CalculateMeshSerializer, ReconstructionSerializer
+    CalculateMeshSerializer, ReconstructionSerializer,
+    SaveReconstructionSerializer
 )
 from reconstruction.models import InitialMaskFile, HoughPreviewFile, Reconstruction
 from upload_files.models import UploadedFile
@@ -17,6 +18,7 @@ from reconstruction.utils.plan2reconstruction import get_initial_mask_and_image,
 from PIL import Image
 import numpy as np
 import cv2
+from rest_framework.parsers import JSONParser
 
 class CalculateInitialMaskView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -135,3 +137,24 @@ class CalculateMeshView(APIView):
         response = Response(ReconstructionSerializer(mesh_obj).data, status=status.HTTP_201_CREATED)
         response['X-Tab-Title'] = mesh_obj.get_name()
         return response 
+
+class SaveReconstructionView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        serializer = SaveReconstructionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        reconstruction_id = serializer.validated_data['id']
+        name = serializer.validated_data['name']
+        try:
+            reconstruction = Reconstruction.objects.get(id=reconstruction_id)
+        except Reconstruction.DoesNotExist:
+            return Response({'detail': 'Реконструкция не найдена'}, status=status.HTTP_404_NOT_FOUND)
+        if reconstruction.created_by != request.user:
+            return Response({'detail': 'Доступ запрещён: только создатель может сохранить реконструкцию'}, status=status.HTTP_403_FORBIDDEN)
+        if reconstruction.saved_at is not None:
+            return Response({'detail': 'Реконструкция уже сохранена'}, status=status.HTTP_400_BAD_REQUEST)
+        reconstruction.name = name
+        reconstruction.saved_at = timezone.now()
+        reconstruction.save(update_fields=['name', 'saved_at'])
+        return Response(ReconstructionSerializer(reconstruction).data, status=status.HTTP_200_OK) 
