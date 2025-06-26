@@ -12,6 +12,7 @@ urlpatterns = [
     path('api/v1/common/', include('common.api.urls')),  # Общие эндпоинты
     path('api/v1/upload/', include('upload_files.api.urls')),  # Загрузка файлов
     path('api/v1/reconstruction/', include('reconstruction.api.urls')),  # Reconstruction API
+    path('', include('mesh_render.urls')),
     
     # Swagger URLs
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

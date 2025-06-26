@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'mainpage',
     'upload_files',
     'reconstruction',
+    'mesh_render',
 ]
 
 MIDDLEWARE = [

@@ -35,3 +35,19 @@ class HoughPreviewFile(models.Model):
 
     def __str__(self):
         return f'{self.id} ({self.created_at:%Y-%m-%d %H:%M})'
+
+class Reconstruction(models.Model):
+    id = models.AutoField(primary_key=True)
+    mesh_file_path = models.CharField(max_length=255)
+    created_at = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reconstructions')
+    is_saved = models.BooleanField(default=False)
+    saved_at = models.DateTimeField(null=True, blank=True, default=None)
+
+    class Meta:
+        verbose_name = '3D реконструкция'
+        verbose_name_plural = '3D реконструкции'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.id} ({self.created_at:%Y-%m-%d %H:%M})'
