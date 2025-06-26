@@ -97,7 +97,7 @@ class ReconstructionListCreateView(generics.ListCreateAPIView):
     serializer_class = ReconstructionSerializer
 
     def get_queryset(self):
-        queryset = Reconstruction.objects.filter(created_by=self.request.user)
+        queryset = Reconstruction.objects.all()
         is_saved = self.request.query_params.get('is_saved')
         if is_saved is not None:
             if is_saved.lower() in ['1', 'true', 'yes']:
@@ -179,19 +179,12 @@ class ReconstructionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIV
         return [IsAuthenticated()]
 
     def get_queryset(self):
-        user = self.request.user
-        # GET — только свои, PATCH/DELETE — свои или staff/superuser
-        if self.request.method == 'GET':
-            return Reconstruction.objects.filter(created_by=user)
+        # Теперь любой аутентифицированный пользователь может получить реконструкцию по id
         return Reconstruction.objects.all()
 
     def check_object_permissions(self, request, obj):
         user = request.user
-        if request.method == 'GET':
-            if obj.created_by != user:
-                from rest_framework.exceptions import PermissionDenied
-                raise PermissionDenied('Можно просматривать только свои реконструкции.')
-        elif request.method in ['PATCH', 'DELETE']:
+        if request.method in ['PATCH', 'DELETE']:
             if not (obj.created_by == user or user.is_staff or user.is_superuser):
                 from rest_framework.exceptions import PermissionDenied
                 raise PermissionDenied('Можно изменять или удалять только свои реконструкции или если вы staff/superuser.')
