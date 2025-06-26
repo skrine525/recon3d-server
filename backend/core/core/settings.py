@@ -181,7 +181,11 @@ DJOSER = {
         'user_create': 'djoser.serializers.UserCreateSerializer',
         'user': 'common.api.serializers.CustomUserSerializer',
         'current_user': 'common.api.serializers.CustomUserSerializer',
-    }
+    },
+    'PERMISSIONS': {
+        'user': ['rest_framework.permissions.IsAuthenticated'],
+        'user_list': ['rest_framework.permissions.IsAuthenticated'],
+    },
 }
 
 # Swagger settings

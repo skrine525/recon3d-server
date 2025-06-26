@@ -19,7 +19,7 @@ from PIL import Image
 import numpy as np
 import cv2
 from rest_framework.parsers import JSONParser
-from rest_framework import generics
+from rest_framework import generics, mixins
 
 class CalculateInitialMaskView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -97,7 +97,7 @@ class ReconstructionListCreateView(generics.ListCreateAPIView):
     serializer_class = ReconstructionSerializer
 
     def get_queryset(self):
-        queryset = Reconstruction.objects.filter(created_by=self.request.user)
+        queryset = Reconstruction.objects.all()
         is_saved = self.request.query_params.get('is_saved')
         if is_saved is not None:
             if is_saved.lower() in ['1', 'true', 'yes']:
@@ -167,4 +167,34 @@ class SaveReconstructionView(APIView):
         reconstruction.name = name
         reconstruction.saved_at = timezone.now()
         reconstruction.save(update_fields=['name', 'saved_at'])
-        return Response(ReconstructionSerializer(reconstruction).data, status=status.HTTP_200_OK) 
+        return Response(ReconstructionSerializer(reconstruction).data, status=status.HTTP_200_OK)
+
+class ReconstructionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ReconstructionSerializer
+    queryset = Reconstruction.objects.all()
+    lookup_field = 'id'
+
+    def get_permissions(self):
+        from rest_framework.permissions import IsAuthenticated
+        return [IsAuthenticated()]
+
+    def get_queryset(self):
+        # Теперь любой аутентифицированный пользователь может получить реконструкцию по id
+        return Reconstruction.objects.all()
+
+    def check_object_permissions(self, request, obj):
+        user = request.user
+        if request.method in ['PATCH', 'DELETE']:
+            if not (obj.created_by == user or user.is_staff or user.is_superuser):
+                from rest_framework.exceptions import PermissionDenied
+                raise PermissionDenied('Можно изменять или удалять только свои реконструкции или если вы staff/superuser.')
+        super().check_object_permissions(request, obj)
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        name = request.data.get('name')
+        if name is not None:
+            instance.name = name
+            instance.save(update_fields=['name'])
+            return Response(self.get_serializer(instance).data)
+        return Response({'detail': 'Only "name" can be updated.'}, status=400) 
