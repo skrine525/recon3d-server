@@ -167,4 +167,14 @@ class SaveReconstructionView(APIView):
         reconstruction.name = name
         reconstruction.saved_at = timezone.now()
         reconstruction.save(update_fields=['name', 'saved_at'])
-        return Response(ReconstructionSerializer(reconstruction).data, status=status.HTTP_200_OK) 
+        return Response(ReconstructionSerializer(reconstruction).data, status=status.HTTP_200_OK)
+
+class ReconstructionRetrieveView(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ReconstructionSerializer
+    queryset = Reconstruction.objects.all()
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        # Только свои реконструкции
+        return Reconstruction.objects.filter(created_by=self.request.user) 
