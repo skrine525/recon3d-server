@@ -44,8 +44,11 @@ def reconstruct_3d_from_plan(image_path, user_mask_path):
     # Step 4: Find Hough lines on the final processed mask
     lines = cv2.HoughLinesP(final_mask, 1, np.pi/180, threshold=80, minLineLength=40, maxLineGap=10)
     
+    # Получаем высоту изображения для коррекции координат, чтобы избежать отзеркаливания
+    height, _ = final_mask.shape[:2]
+    
     # Step 5: Build 3D model from these lines
-    mesh = lines_to_3d(lines, wall_thickness=10, wall_height=100)
+    mesh = lines_to_3d(lines, height, wall_thickness=10, wall_height=100)
     
     return mesh
 
@@ -126,7 +129,7 @@ def get_wall_mask(image_path):
     binary = _binarize(img)
     return _morph(binary)
 
-def lines_to_3d(lines, wall_thickness=10, wall_height=100, add_floor=True, floor_thickness=5, wall_texture_path=None, floor_texture_path=None, texture_scale=150.0):
+def lines_to_3d(lines, image_height, wall_thickness=10, wall_height=100, add_floor=True, floor_thickness=5, wall_texture_path=None, floor_texture_path=None, texture_scale=150.0):
     """
     Converts lines from Hough transform to a 3D mesh.
     Includes robust checks for empty or invalid geometry.
@@ -142,6 +145,10 @@ def lines_to_3d(lines, wall_thickness=10, wall_height=100, add_floor=True, floor
         if line_arr is None or len(line_arr) == 0:
             continue
         x1, y1, x2, y2 = line_arr[0]
+        
+        # Y-координаты инвертируются, чтобы модель не была отзеркаленной
+        y1 = image_height - y1
+        y2 = image_height - y2
         
         dx, dy = x2 - x1, y2 - y1
         length = np.hypot(dx, dy)
