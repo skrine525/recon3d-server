@@ -37,12 +37,22 @@ class HoughPreviewFile(models.Model):
         return f'{self.id} ({self.created_at:%Y-%m-%d %H:%M})'
 
 class Reconstruction(models.Model):
+    class Status(models.IntegerChoices):
+        QUEUED = 1, 'В очереди'
+        IN_PROGRESS = 2, 'В обработке'
+        DONE = 3, 'Готово'
+        FAILED = 4, 'Ошибка'
+
     id = models.AutoField(primary_key=True)
-    mesh_file_path = models.CharField(max_length=255)
+    mesh_file_path = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reconstructions')
     saved_at = models.DateTimeField(null=True, blank=True, default=None, db_index=True)
     name = models.CharField(max_length=255, null=True, blank=True, default=None)
+    status = models.PositiveSmallIntegerField(
+        choices=Status.choices,
+        default=Status.QUEUED
+    )
 
     class Meta:
         verbose_name = '3D реконструкция'
@@ -50,7 +60,7 @@ class Reconstruction(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f'{self.get_name()} ({self.created_at:%Y-%m-%d %H:%M})'
+        return f'{self.id} ({self.created_at:%Y-%m-%d %H:%M})'
 
     def get_name(self):
         return self.name if self.name else f'Реконструкция №{self.id}'

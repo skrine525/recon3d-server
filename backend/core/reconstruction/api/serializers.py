@@ -43,9 +43,10 @@ class CalculateMeshSerializer(serializers.Serializer):
 class ReconstructionSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
+    status_display = serializers.SerializerMethodField()
     class Meta:
         model = Reconstruction
-        fields = ['id', 'name', 'created_at', 'created_by', 'saved_at', 'url']
+        fields = ['id', 'name', 'status', 'status_display', 'created_at', 'created_by', 'saved_at', 'url']
         read_only_fields = fields
 
     def get_url(self, obj):
@@ -57,6 +58,9 @@ class ReconstructionSerializer(serializers.ModelSerializer):
 
     def get_name(self, obj):
         return obj.get_name()
+
+    def get_status_display(self, obj):
+        return obj.get_status_display()
 
 class SaveReconstructionSerializer(serializers.Serializer):
     name = serializers.CharField(required=True) 
