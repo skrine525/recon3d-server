@@ -12,6 +12,7 @@ urlpatterns = [
     path('api/v1/common/', include('common.api.urls')),  # Общие эндпоинты
     path('api/v1/upload/', include('upload_files.api.urls')),  # Загрузка файлов
     path('api/v1/reconstruction/', include('reconstruction.api.urls')),  # Reconstruction API
+    path('api/v1/identification/', include('identification.api.urls')),
     path('', include('mesh_render.urls')),
     
     # Swagger URLs

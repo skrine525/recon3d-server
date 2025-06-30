@@ -230,6 +230,7 @@ def bind_signs(signs, model_path):
 # Идентификация, принимает знаки с плана и с фото (вывод двух финальных функций), возвращает координаты метки пользователя
 def get_user_pos(signs_plan, signs_photo, scale):
     cat_signs = []
+    un_signs = []
 
     for sph in signs_photo:
         match_signs = []
@@ -239,32 +240,49 @@ def get_user_pos(signs_plan, signs_photo, scale):
                 spl["dist"] = sph["dist"]
                 match_signs.append(spl)
         if match_signs:
+            if len(match_signs) == 1:
+                un_signs.append(match_signs[0]["name"])
             cat_signs.append(match_signs)
 
-    combs = itertools.product(*cat_signs)
+    if len(cat_signs) == 1 and len(cat_signs[0]) == 1:
+        sign = cat_signs[0][0]
+        if sign["name"] in un_signs:
+            x = sign["x"] + sign["dist"] * scale * np.cos(np.radians(sign["angle"]))
+            y = sign["y"] + sign["dist"] * scale * np.sin(np.radians(sign["angle"]))
 
-    min_c = -1
-    min_d = 100000000
+            return {"x": x, "y": y, "angle": 0}
+        else:
+            return "Знаков слишком мало/Нет уникальных знаков"
+    else:
+        combs = itertools.product(*cat_signs)
 
-    for i, comb in enumerate(combs):
-        dots = []
-        for sign in comb:
-            dots.append([int(sign["x"]), int(sign["y"])])
-        dots = np.array(dots)
-        if cv.arcLength(dots, True) <= min_d:
-            min_d = cv.arcLength(dots, True)
-            min_c = comb
+        min_c = -1
+        min_d = 100000000
 
-    x_c = 0
-    y_c = 0
+        for i, comb in enumerate(combs):
+            dots = []
+            for sign in comb:
+                dots.append([int(sign["x"]), int(sign["y"])])
+            dots = np.array(dots)
+            if cv.arcLength(dots, True) <= min_d:
+                min_d = cv.arcLength(dots, True)
+                min_c = comb
 
-    for sign in min_c:
-        x_c += sign["dist"] * np.cos(np.radians(sign["angle"])) + sign["x"]
-        y_c += sign["dist"] * np.sin(np.radians(sign["angle"])) + sign["y"]
-    x_c /= len(min_c)
-    y_c /= len(min_c)
+        xs = []
+        ys = []
 
-    return [x_c, y_c, min_c, scale]
+        for sign in min_c:
+            x_s = sign["x"] + sign["dist"] * scale * np.cos(np.radians(sign["angle"]))
+            print(np.cos(np.radians(sign["angle"])))
+            xs.append(x_s)
+            y_s = sign["y"] + sign["dist"] * scale * np.sin(np.radians(sign["angle"]))
+            print(np.sin(np.radians(sign["angle"])))
+            ys.append(y_s)
+
+        x = np.mean(xs)
+        y = np.mean(ys)
+
+        return {"x": x, "y": y, "angle": 0}
 
 
 # Тоже финалка, получает путь к фото плана, привязывает знаки к модели, возвращает набор знаков
