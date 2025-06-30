@@ -1,9 +1,21 @@
 services:
+  3d-redis:
+    image: redis:7.2
+    container_name: 3d-redis
+    hostname: redis.3d.internal
+    restart: unless-stopped
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - 127.0.0.1:6379:6379
   3d-postgres:
-    image: postgres:16.1
+    image: postgres:16.9
     container_name: 3d-postgres
     hostname: postgres.3d.internal
-    env_file: .env
+    environment:
+      - POSTGRES_DB=3d
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     restart: unless-stopped
     volumes:
        - ./data/postgres:/var/lib/postgresql/data
@@ -23,3 +35,21 @@ services:
       - ./backend/core:/app/core
     ports:
       - 8000:80
+    depends_on:
+      - 3d-postgres
+      - 3d-redis
+  3d-celery-worker:
+    build:
+      context: ./backend
+      target: base
+    image: 3d-backend:local-dev
+    container_name: 3d-celery-worker
+    hostname: celery-worker.3d.internal
+    env_file: .env
+    command: ["celery"]
+    restart: unless-stopped
+    volumes:
+      - ./backend/core:/app/core
+    depends_on:
+      - 3d-postgres
+      - 3d-redis

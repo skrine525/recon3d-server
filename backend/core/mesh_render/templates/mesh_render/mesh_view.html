@@ -79,7 +79,7 @@
                 // Визуализация точки, если она есть
                 const targetPoint = JSON.parse('{{ target_point_json|escapejs }}');
                 if (targetPoint) {
-                    const sphereRadius = radius * 0.02; // Радиус шарика — 2% от радиуса модели
+                    const sphereRadius = radius * 0.01; // Радиус шарика — 1% от радиуса модели
                     const sphereGeo = new THREE.SphereGeometry(sphereRadius, 16, 16);
                     const sphereMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
                     const sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);

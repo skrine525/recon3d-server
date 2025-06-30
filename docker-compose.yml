@@ -11,6 +11,22 @@ services:
       - 3d
     volumes:
       - ./logs/3d-static:/var/log/nginx/
+  3d-celery-worker:
+    build:
+      context: ./backend
+      target: app
+    image: 3d-backend:local-dev
+    container_name: 3d-celery-worker
+    hostname: celery-worker.3d.internal
+    env_file: .env
+    command: ["celery"]
+    restart: unless-stopped
+    networks:
+      - 3d
+      - postgres
+      - redis
+    volumes:
+      - 3d-media:/app/core/media
   3d-backend:
     build:
       context: ./backend
@@ -23,8 +39,11 @@ services:
     networks:
       - 3d
       - postgres
+      - redis
     volumes:
       - 3d-media:/app/core/media
+    depends_on:
+      - 3d-celery-worker
   3d-nginx:
     build: nginx
     image: 3d-nginx
@@ -50,4 +69,6 @@ networks:
     name: 3d
     driver: bridge
   postgres:
+    external: true
+  redis:
     external: true

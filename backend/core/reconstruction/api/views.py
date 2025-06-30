@@ -20,6 +20,7 @@ import numpy as np
 import cv2
 from rest_framework.parsers import JSONParser
 from rest_framework import generics, mixins
+from reconstruction.tasks import create_reconstruction_task
 
 class CalculateInitialMaskView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -109,43 +110,38 @@ class ReconstructionListCreateView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = CalculateMeshSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         plan_file_id = serializer.validated_data['plan_file_id']
         user_mask_file_id = serializer.validated_data['user_mask_file_id']
+
+        # Проверяем существование файлов перед созданием объекта
         try:
-            plan_file = UploadedFile.objects.get(id=plan_file_id)
+            plan_file = UploadedFile.objects.get(id=plan_file_id, file_type=UploadedFile.FileType.PHOTO, source_type=UploadedFile.SourceType.PLAN_2D)
         except UploadedFile.DoesNotExist:
-            return Response({'detail': 'План не найден'}, status=status.HTTP_404_NOT_FOUND)
-        if plan_file.file_type != UploadedFile.FileType.PHOTO or plan_file.source_type != UploadedFile.SourceType.PLAN_2D:
-            return Response({'detail': 'plan_file_id должен быть фото 2D-плана'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': 'Файл плана не найден или имеет неверный тип.'}, status=status.HTTP_404_NOT_FOUND)
+
         try:
-            user_mask_file = UploadedFile.objects.get(id=user_mask_file_id)
+            user_mask_file = UploadedFile.objects.get(id=user_mask_file_id, file_type=UploadedFile.FileType.PHOTO, source_type=UploadedFile.SourceType.USER_MASK)
         except UploadedFile.DoesNotExist:
-            return Response({'detail': 'Маска не найдена'}, status=status.HTTP_404_NOT_FOUND)
-        if user_mask_file.file_type != UploadedFile.FileType.PHOTO or user_mask_file.source_type != UploadedFile.SourceType.USER_MASK:
-            return Response({'detail': 'user_mask_file_id должен быть маской пользователя'}, status=status.HTTP_400_BAD_REQUEST)
-        plan_path = os.path.join(settings.MEDIA_ROOT, plan_file.file_path)
-        user_mask_path = os.path.join(settings.MEDIA_ROOT, user_mask_file.file_path)
-        try:
-            mesh = reconstruct_3d_from_plan(plan_path, user_mask_path)
-        except Exception as e:
-            return Response({'detail': f'Ошибка при построении меша: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        if mesh is None:
-            return Response({'detail': 'Не удалось построить 3D-модель (нет линий)'}, status=status.HTTP_400_BAD_REQUEST)
-        mesh_rel_path = f'mesh/{uuid.uuid4()}.obj'
-        mesh_abs_path = os.path.join(settings.MEDIA_ROOT, mesh_rel_path)
-        os.makedirs(os.path.dirname(mesh_abs_path), exist_ok=True)
-        try:
-            save_mesh(mesh, mesh_abs_path)
-        except Exception as e:
-            return Response({'detail': f'Ошибка при сохранении меша: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'detail': 'Файл маски не найден или имеет неверный тип.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Создаем объект реконструкции
         mesh_obj = Reconstruction.objects.create(
-            mesh_file_path=mesh_rel_path,
-            created_at=timezone.now(),
             created_by=request.user,
-            saved_at=None,
-            name=None
+            status=Reconstruction.Status.QUEUED
         )
-        response = Response(ReconstructionSerializer(mesh_obj).data, status=status.HTTP_201_CREATED)
+
+        # Запускаем асинхронную задачу
+        create_reconstruction_task.delay(
+            reconstruction_id=mesh_obj.id,
+            plan_file_id=plan_file.id,
+            user_mask_file_id=user_mask_file.id
+        )
+
+        # Возвращаем ответ
+        response_serializer = self.get_serializer(mesh_obj)
+        headers = self.get_success_headers(response_serializer.data)
+        response = Response(response_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         response['X-Tab-Title'] = mesh_obj.get_name()
         return response
 

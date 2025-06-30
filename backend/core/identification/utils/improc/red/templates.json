@@ -1,0 +1,26 @@
+[
+    {
+        "name": "phone",
+        "votes": ["phone"]
+    },
+    {
+        "name": "signal",
+        "votes": ["signal"]
+    },
+    {
+        "name": "siren",
+        "votes": ["siren"]
+    },
+    {
+        "name": "hose",
+        "votes": ["hose"]
+    },
+    {
+        "name": "firekit",
+        "votes": ["firekit"]
+    },
+    {
+        "name": "extinguisher",
+        "votes": ["extinguisher"]
+    }
+]

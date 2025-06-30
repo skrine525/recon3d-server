@@ -1,0 +1,58 @@
+[
+    {
+        "name": "arrow_l",
+        "votes": ["exitleft"]
+    },
+    {
+        "name": "arrow_r",
+        "votes": ["exitright"]
+    },
+    {
+        "name": "runman_l",
+        "votes": ["exitleft"]
+    },
+    {
+        "name": "runman_r",
+        "votes": ["exitright"]
+    },
+    {
+        "name": "door",
+        "votes": ["exitright", "exitleft"]
+    },
+    {
+        "name": "exithere_l",
+        "votes": ["exithere_l"]
+    },
+    {
+        "name": "exithere_r",
+        "votes": ["exithere_r"]
+    },
+    {
+        "name": "B",
+        "votes": ["exit"]
+    },
+    {
+        "name": "X",
+        "votes": ["exit"]
+    },
+    {
+        "name": "D",
+        "votes": ["exit"]
+    },
+    {
+        "name": "stairman_ld",
+        "votes": ["stairsdown_l"]
+    },
+    {
+        "name": "stairman_rd",
+        "votes": ["stairsdown_r"]
+    },
+    {
+        "name": "stairman_ru",
+        "votes": ["stairsup_r"]
+    },
+    {
+        "name": "stairman_lu",
+        "votes": ["stairsup_l"]
+    }
+]

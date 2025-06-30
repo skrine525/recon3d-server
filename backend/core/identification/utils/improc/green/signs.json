@@ -1,0 +1,11 @@
+{
+    "exitright": { "width": 0.2, "height": 0.1 },
+    "exitleft": { "width": 0.2, "height": 0.1 },
+    "exithere_r": { "width": 0.1, "height": 0.1 },
+    "exithere_l": { "width": 0.1, "height": 0.1 },
+    "exit": { "width": 0.2, "height": 0.1 },
+    "stairsup_l": { "width": 0.1, "height": 0.1 },
+    "stairsup_r": { "width": 0.1, "height": 0.1 },
+    "stairsdown_l": { "width": 0.1, "height": 0.1 },
+    "stairsdown_r": { "width": 0.1, "height": 0.1 }
+}
