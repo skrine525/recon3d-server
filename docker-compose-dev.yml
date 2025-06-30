@@ -1,4 +1,13 @@
 services:
+  3d-redis:
+    image: redis:7.2
+    container_name: 3d-redis
+    hostname: redis.3d.internal
+    restart: unless-stopped
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - 127.0.0.1:6379:6379
   3d-postgres:
     image: postgres:16.1
     container_name: 3d-postgres
