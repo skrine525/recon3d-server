@@ -32,3 +32,21 @@ services:
       - ./backend/core:/app/core
     ports:
       - 8000:80
+    depends_on:
+      - 3d-postgres
+      - 3d-redis
+  3d-celery-worker:
+    build:
+      context: ./backend
+      target: base
+    image: 3d-backend:local-dev
+    container_name: 3d-celery-worker
+    hostname: celery-worker.3d.internal
+    env_file: .env
+    command: ["celery"]
+    restart: unless-stopped
+    volumes:
+      - ./backend/core:/app/core
+    depends_on:
+      - 3d-postgres
+      - 3d-redis
