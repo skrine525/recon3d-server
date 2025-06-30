@@ -1,0 +1,8 @@
+{
+    "signal": { "width": 0.1, "height": 0.1 },
+    "extinguisher": { "width": 0.1, "height": 0.1 },
+    "hose": { "width": 0.1, "height": 0.1 },
+    "siren": { "width": 0.1, "height": 0.1 },
+    "phone": { "width": 0.1, "height": 0.1 },
+    "firekit": { "width": 0.1, "height": 0.1 }
+}

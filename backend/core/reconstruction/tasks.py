@@ -5,7 +5,9 @@ from django.conf import settings
 import os
 import uuid
 from .utils.plan2reconstruction import reconstruct_3d_from_plan, save_mesh
+from .utils.planproc import process_image
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +22,8 @@ def create_reconstruction_task(reconstruction_id, plan_file_id, user_mask_file_i
         user_mask_file = UploadedFile.objects.get(id=user_mask_file_id)
     except Reconstruction.DoesNotExist:
         logger.error(f"Реконструкция с id={reconstruction_id} не найдена.")
+        reconstruction.status = Reconstruction.Status.FAILED
+        reconstruction.save(update_fields=['status'])
         return
     except UploadedFile.DoesNotExist:
         logger.error(f"Файл плана ({plan_file_id}) или маски ({user_mask_file_id}) не найден.")
@@ -46,10 +50,15 @@ def create_reconstruction_task(reconstruction_id, plan_file_id, user_mask_file_i
         os.makedirs(os.path.dirname(mesh_abs_path), exist_ok=True)
         save_mesh(mesh, mesh_abs_path)
 
-        # 4. Обновление объекта Reconstruction
+        # 4. Получение признаков плана (после построения меша)
+        plan_signs_result = process_image(plan_path, mesh_abs_path)
+        print(len(plan_signs_result))
+
+        # 5. Обновление объекта Reconstruction (один раз)
         reconstruction.mesh_file_path = mesh_rel_path
         reconstruction.status = Reconstruction.Status.DONE
-        reconstruction.save(update_fields=['mesh_file_path', 'status'])
+        reconstruction.plan_signs = plan_signs_result
+        reconstruction.save(update_fields=['mesh_file_path', 'status', 'plan_signs'])
         logger.info(f"Реконструкция {reconstruction_id} успешно завершена.")
 
     except Exception as e:
