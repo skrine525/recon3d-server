@@ -27,6 +27,7 @@ class IdentificationCreateView(APIView):
         # Создаём объект Identification
         identification = Identification.objects.create(
             created_by=request.user,
+            reconstruction_id=reconstruction_id,
             status=Identification.Status.QUEUED
         )
         # Запускаем асинхронную задачу

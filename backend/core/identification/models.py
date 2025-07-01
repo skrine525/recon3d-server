@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from reconstruction.models import Reconstruction
 
 # Create your models here.
 
@@ -15,6 +16,7 @@ class Identification(models.Model):
     id = models.AutoField(primary_key=True)
     created_at = models.DateTimeField(default=timezone.now)
     created_by = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='identifications')
+    reconstruction = models.ForeignKey(Reconstruction, on_delete=models.CASCADE, related_name='identifications', null=True, blank=True, default=None)
     status = models.PositiveSmallIntegerField(choices=Status.choices, default=Status.QUEUED)
     x_value = models.IntegerField(null=True, blank=True)
     y_value = models.IntegerField(null=True, blank=True)

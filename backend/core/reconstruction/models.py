@@ -53,7 +53,6 @@ class Reconstruction(models.Model):
         choices=Status.choices,
         default=Status.QUEUED
     )
-    plan_signs = models.JSONField(null=True, blank=True)
     rooms = models.JSONField(null=True, blank=True)
 
     class Meta:
