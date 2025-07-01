@@ -83,6 +83,13 @@ def find_room_numbers(image_path, debug_dir="debug_rois", max_results=3):
     :return: список уникальных номеров
     """
     image = cv2.imread(image_path)
+    # TODO: Подобрать оптимальное сжатие изображения для ускорения работы алгоритма
+    # Сжимаем изображение, если оно слишком большое (например, ширина > 1000px)
+    max_width = 1000
+    if image.shape[1] > max_width:
+        scale = max_width / image.shape[1]
+        new_dim = (max_width, int(image.shape[0] * scale))
+        image = cv2.resize(image, new_dim, interpolation=cv2.INTER_AREA)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     _, thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
