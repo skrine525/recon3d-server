@@ -51,14 +51,14 @@ def create_reconstruction_task(reconstruction_id, plan_file_id, user_mask_file_i
         save_mesh(mesh, mesh_abs_path)
 
         # 4. Получение признаков плана (после построения меша)
-        plan_signs_result = process_image(plan_path, mesh_abs_path)
-        print(len(plan_signs_result))
+        # plan_signs_result = process_image(plan_path, mesh_abs_path)
+        # plan_signs_result = {}
+        # print(len(plan_signs_result))
 
         # 5. Обновление объекта Reconstruction (один раз)
         reconstruction.mesh_file_path = mesh_rel_path
         reconstruction.status = Reconstruction.Status.DONE
-        reconstruction.plan_signs = plan_signs_result
-        reconstruction.save(update_fields=['mesh_file_path', 'status', 'plan_signs'])
+        reconstruction.save(update_fields=['mesh_file_path', 'status'])
         logger.info(f"Реконструкция {reconstruction_id} успешно завершена.")
 
     except Exception as e:

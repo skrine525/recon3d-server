@@ -190,8 +190,6 @@ def bind_signs(signs, model_path):
 
     faces = scene.mesh_list[0].faces
 
-    plan_signs = []
-
     for key, colors in signs.items():
         for sign in colors:
             dot1 = [sign["x"], sign["y"]]
@@ -219,12 +217,6 @@ def bind_signs(signs, model_path):
             if a[1] > dot1[1]:
                 angle = 360 - angle
             angle = (angle // 45) * 45
-            plan_signs.append({"name": sign["name"],
-                               "x": a[0],
-                               "y": a[1],
-                               "angle": angle})
-
-    return plan_signs
 
 
 # Идентификация, принимает знаки с плана и с фото (вывод двух финальных функций), возвращает координаты метки пользователя
@@ -309,6 +301,3 @@ def process_image(plan_file_path, model_path):
     signs['red'] = find_signs(templates['red'], red_mask, drawyimg, 'red')
     signs['green'] = find_signs(templates['green'], green_mask, drawyimg, 'green')
     # print(signs)
-    signs_plan = bind_signs(signs, model_path)
-
-    return signs_plan

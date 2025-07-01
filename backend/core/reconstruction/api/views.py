@@ -5,7 +5,8 @@ from .serializers import (
     CalculateInitialMaskSerializer, InitialMaskFileSerializer,
     CalculateHoughSerializer, HoughPreviewFileSerializer,
     CalculateMeshSerializer, ReconstructionSerializer,
-    SaveReconstructionSerializer
+    SaveReconstructionSerializer,
+    RoomsUpdateSerializer
 )
 from reconstruction.models import InitialMaskFile, HoughPreviewFile, Reconstruction
 from upload_files.models import UploadedFile
@@ -193,4 +194,22 @@ class ReconstructionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIV
             instance.name = name
             instance.save(update_fields=['name'])
             return Response(self.get_serializer(instance).data)
-        return Response({'detail': 'Only "name" can be updated.'}, status=400) 
+        return Response({'detail': 'Only "name" can be updated.'}, status=400)
+
+# Новый view для обновления комнат
+class UpdateRoomsView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request, id, *args, **kwargs):
+        serializer = RoomsUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        rooms = serializer.validated_data['rooms']
+        try:
+            reconstruction = Reconstruction.objects.get(id=id)
+        except Reconstruction.DoesNotExist:
+            return Response({'detail': 'Реконструкция не найдена'}, status=status.HTTP_404_NOT_FOUND)
+        if reconstruction.created_by != request.user:
+            return Response({'detail': 'Доступ запрещён: только создатель может обновлять комнаты'}, status=status.HTTP_403_FORBIDDEN)
+        reconstruction.rooms = rooms
+        reconstruction.save(update_fields=['rooms'])
+        return Response({'rooms': reconstruction.rooms}, status=status.HTTP_200_OK) 
