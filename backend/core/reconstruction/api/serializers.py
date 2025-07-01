@@ -63,4 +63,8 @@ class ReconstructionSerializer(serializers.ModelSerializer):
         return obj.get_status_display()
 
 class SaveReconstructionSerializer(serializers.Serializer):
-    name = serializers.CharField(required=True) 
+    name = serializers.CharField(required=True)
+
+# Новый сериализатор для обновления комнат
+class RoomsUpdateSerializer(serializers.Serializer):
+    rooms = serializers.JSONField(required=True) 

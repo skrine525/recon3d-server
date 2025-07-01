@@ -13,7 +13,7 @@ RUN pip install poetry==2.0.0
 RUN poetry install
 
 # Установка пакетов
-RUN apt-get update && apt-get install -y libgl1 libglib2.0-0
+RUN apt-get update && apt-get install -y libgl1 libglib2.0-0 tesseract-ocr
 
 # Перемещаем ресурсы контейнера
 COPY ./docker/app ./docker/app

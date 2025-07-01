@@ -51,7 +51,8 @@ def create_reconstruction_task(reconstruction_id, plan_file_id, user_mask_file_i
         save_mesh(mesh, mesh_abs_path)
 
         # 4. Получение признаков плана (после построения меша)
-        plan_signs_result = process_image(plan_path, mesh_abs_path)
+        # plan_signs_result = process_image(plan_path, mesh_abs_path)
+        plan_signs_result = {}
         print(len(plan_signs_result))
 
         # 5. Обновление объекта Reconstruction (один раз)

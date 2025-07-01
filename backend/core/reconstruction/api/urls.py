@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CalculateInitialMaskView, CalculateHoughView, SaveReconstructionView, ReconstructionListCreateView, ReconstructionRetrieveUpdateDestroyView
+from .views import CalculateInitialMaskView, CalculateHoughView, SaveReconstructionView, ReconstructionListCreateView, ReconstructionRetrieveUpdateDestroyView, UpdateRoomsView
 
 urlpatterns = [
     path('initial-masks', CalculateInitialMaskView.as_view(), name='initial-masks'),
@@ -7,4 +7,5 @@ urlpatterns = [
     path('reconstructions', ReconstructionListCreateView.as_view(), name='reconstructions'),
     path('reconstructions/<int:id>/save', SaveReconstructionView.as_view(), name='save-reconstruction'),
     path('reconstructions/<int:id>', ReconstructionRetrieveUpdateDestroyView.as_view(), name='reconstruction-detail'),
+    path('reconstructions/<int:id>/rooms', UpdateRoomsView.as_view(), name='update-rooms'),
 ] 
