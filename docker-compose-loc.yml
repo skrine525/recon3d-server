@@ -1,0 +1,97 @@
+services:
+  3d-postgres:
+    image: postgres:16.9
+    container_name: 3d-postgres
+    hostname: postgres.3d.internal
+    environment:
+      - POSTGRES_DB=3d
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    restart: unless-stopped
+    networks:
+      - 3d
+    volumes:
+       - 3d-pg:/var/lib/postgresql/data
+  3d-redis:
+    image: redis:7.2
+    container_name: 3d-redis
+    hostname: redis.3d.internal
+    restart: unless-stopped
+    networks:
+      - 3d
+    volumes:
+      - 3d-redis:/data
+  3d-static:
+    build:
+      context: ./backend
+      target: static
+    image: 3d-static
+    container_name: 3d-static
+    restart: unless-stopped
+    hostname: static.3d.internal
+    networks:
+      - 3d
+    volumes:
+      - ./logs/3d-static:/var/log/nginx/
+  3d-celery-worker:
+    build:
+      context: ./backend
+      target: app
+    image: 3d-backend:local-dev
+    container_name: 3d-celery-worker
+    hostname: celery-worker.3d.internal
+    env_file: .env
+    command: ["celery"]
+    restart: unless-stopped
+    networks:
+      - 3d
+    volumes:
+      - 3d-media:/app/core/media
+    depends_on:
+      - 3d-redis
+      - 3d-postgres
+  3d-backend:
+    build:
+      context: ./backend
+      target: app
+    image: 3d-backend
+    container_name: 3d-backend
+    restart: unless-stopped
+    env_file: .env
+    hostname: backend.3d.internal
+    networks:
+      - 3d
+    volumes:
+      - 3d-media:/app/core/media
+    depends_on:
+      - 3d-celery-worker
+      - 3d-redis
+      - 3d-postgres
+  3d-nginx:
+    build: nginx
+    image: 3d-nginx
+    container_name: 3d-nginx
+    restart: unless-stopped
+    hostname: nginx.3d.internal
+    networks:
+      - 3d
+    ports:
+      - 8000:80
+    volumes:
+      - ./logs/3d-nginx:/var/log/nginx/
+    depends_on:
+      - 3d-static
+      - 3d-backend
+
+volumes:
+  3d-media:
+    name: 3d-media
+  3d-redis:
+    name: 3d-redis
+  3d-pg:
+    name: 3d-pg
+
+networks:
+  3d:
+    name: 3d
+    driver: bridge

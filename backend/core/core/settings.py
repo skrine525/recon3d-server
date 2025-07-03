@@ -26,11 +26,13 @@ ALLOWED_HOSTS = [
 CORS_ALLOWED_ORIGINS = [
     'https://dev.radabot.ru',
     'https://3d.radabot.ru',
+    'http://localhost:8000',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://dev.radabot.ru',
     'https://3d.radabot.ru',
+    'http://localhost:8000',
 ]
 
 CORS_ALLOW_METHODS = [
