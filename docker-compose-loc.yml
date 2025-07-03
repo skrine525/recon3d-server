@@ -17,6 +17,8 @@ services:
     container_name: 3d-redis
     hostname: redis.3d.internal
     restart: unless-stopped
+    networks:
+      - 3d
     volumes:
       - 3d-redis:/data
   3d-static:
@@ -59,8 +61,6 @@ services:
     hostname: backend.3d.internal
     networks:
       - 3d
-      - postgres
-      - redis
     volumes:
       - 3d-media:/app/core/media
     depends_on:
