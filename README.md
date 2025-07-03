@@ -33,7 +33,7 @@
 - Бэкенд: [http://localhost:8000/](http://localhost:8000/)
 - Админка: [http://localhost:8000/admin/](http://localhost:8000/admin/)
 
-## Остановка контейнеров
+## Разборка контейнеров
    ```bash
    docker compose -f docker-compose-loc.yml down
    ```
